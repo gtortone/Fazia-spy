@@ -9,6 +9,9 @@ configure
 depcomp
 install-sh
 missing
+FzEventSet.pb.cpp
+FzEventSet.pb.h
+fazia_spy
 
 # Compiled Object files
 *.slo
