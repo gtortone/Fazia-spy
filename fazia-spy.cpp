@@ -252,39 +252,42 @@ void *histogramfill(void *var) {
                      const DAQ::FzData& rdata = rdhit.data(m);
                      const DAQ::Waveform& rwf = rdata.waveform();
 
-		     long long int ssin, scos;
-                     unsigned long long int usin = (rwf.sample(0) * pow(2,22)) + (rwf.sample(1) * pow(2,7)) + (rwf.sample(2) / pow(2,8));
-                     unsigned long long int ucos = (rwf.sample(3) * pow(2,22)) + (rwf.sample(4) * pow(2,7)) + (rwf.sample(5) / pow(2,8));
+                     if(adc && (rdata.type() == DAQ::FzData::ADC) ) { 
 
-                     if(rwf.sample(0) & 0x4000)
-                        ssin = usin + 0xFFFFFFE000000000;
-		     else 
-                        ssin = usin;
+		        long long int ssin, scos;
+                        unsigned long long int usin = (rwf.sample(0) * pow(2,22)) + (rwf.sample(1) * pow(2,7)) + (rwf.sample(2) / pow(2,8));
+                        unsigned long long int ucos = (rwf.sample(3) * pow(2,22)) + (rwf.sample(4) * pow(2,7)) + (rwf.sample(5) / pow(2,8));
 
-                     if(rwf.sample(3) & 0x4000)
-                        scos = ucos + 0xFFFFFFE000000000;
-		     else
- 			scos = ucos;
+                        if(rwf.sample(0) & 0x4000)
+                           ssin = usin + 0xFFFFFFE000000000;
+	            	else 
+                           ssin = usin;
 
-                     double refmod = sqrt( pow(ssin,2) + pow(scos,2) ) / pow(10,6);
-                     double phase = atan2(ssin, scos);
+                        if(rwf.sample(3) & 0x4000)
+                           scos = ucos + 0xFFFFFFE000000000;
+      		        else
+ 			   scos = ucos;
 
-                     phase = (360 * phase / (2*3.14)) + 180;
+                        double refmod = sqrt( pow(ssin,2) + pow(scos,2) ) / pow(10,6);
+                        double phase = atan2(ssin, scos);
 
-                     std::cout << "usin(0) " << rwf.sample(0) << std::endl; 
-                     std::cout << "usin(1) " << rwf.sample(1) << std::endl; 
-                     std::cout << "usin(2) " << rwf.sample(2) << std::endl; 
+                        phase = (360 * phase / (2*3.14)) + 180;
 
-                     std::cout << "ucos(0) " << rwf.sample(3) << std::endl; 
-                     std::cout << "ucos(1) " << rwf.sample(4) << std::endl; 
-                     std::cout << "ucos(2) " << rwf.sample(5) << std::endl; 
+                        std::cout << "usin(0) " << rwf.sample(0) << std::endl; 
+                        std::cout << "usin(1) " << rwf.sample(1) << std::endl; 
+                        std::cout << "usin(2) " << rwf.sample(2) << std::endl; 
+
+                        std::cout << "ucos(0) " << rwf.sample(3) << std::endl; 
+                        std::cout << "ucos(1) " << rwf.sample(4) << std::endl; 
+                        std::cout << "ucos(2) " << rwf.sample(5) << std::endl; 
                       
-                     std::cout << std::dec;
-                     std::cout << "sin = " << ssin << " - cos = " << scos << std::endl;
+                        std::cout << std::dec;
+                        std::cout << "sin = " << ssin << " - cos = " << scos << std::endl;
 
-                     printf("refmod = %f - phase = %f\n", refmod, phase);
+                        printf("refmod = %f - phase = %f\n", refmod, phase);
 
-                     phHistogram->Fill(phase); 
+                        phHistogram->Fill(phase); 
+                     }
  
                      signed int supp;
                      
@@ -303,7 +306,7 @@ void *histogramfill(void *var) {
                         }
 
                         //if(adc && (n>5)) {
-                        if(adc) {
+                        if(adc && (rdata.type() == DAQ::FzData::ADC) ) {
 
                            adcHistogram->SetBinContent(n, (Double_t)supp);
                           
